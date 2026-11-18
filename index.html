@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>// dawruh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&family=JetBrains+Mono:wght@300;500;800&display=swap" rel="stylesheet">
+<style>
+/* ===== НАСТРОЙКИ ЦВЕТА ===== */
+:root{
+  --fg:#e9e9e9;
+  --dim:#8a8a8a;
+  --accent:#ff2a6d;
+  --c1:#ff2a6d;  /* розовый */
+  --c2:#8b5cff;  /* фиолет */
+  --c3:#2de2e6;  /* циан */
+  --dark: .72;            /* затемнение видео: 0 — нет, 1 — чёрный */
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:#000;color:var(--fg);font-family:'JetBrains Mono',monospace;overflow:hidden;cursor:crosshair}
+
+/* ---- видео-фон ---- */
+#bg{position:fixed;inset:0;overflow:hidden;z-index:0;pointer-events:none}
+#bg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#shade{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(ellipse at center,rgba(0,0,0,calc(var(--dark) - .2)) 0%,rgba(0,0,0,calc(var(--dark) + .3)) 100%);}
+/* скан-линии + зерно */
+#fx{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.35;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.5) 0 1px,transparent 1px 3px)}
+#grain{position:fixed;inset:-50%;z-index:2;pointer-events:none;opacity:.07;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain 1s steps(6) infinite}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-5%,3%)}40%{transform:translate(4%,-6%)}60%{transform:translate(-3%,5%)}80%{transform:translate(6%,2%)}100%{transform:translate(0,0)}}
+
+/* ---- контент ---- */
+main{position:relative;z-index:3;height:100%;display:flex;flex-direction:column;
+  justify-content:center;align-items:flex-start;padding:0 8vw}
+.tag{font-size:12px;letter-spacing:.4em;color:var(--dim);text-transform:uppercase;margin-bottom:18px}
+.tag b{color:var(--c3);font-weight:500}
+.sub span{background:linear-gradient(90deg,var(--c3),var(--c2));-webkit-background-clip:text;background-clip:text;color:transparent}
+h1{font-family:'Rubik Mono One',sans-serif;font-size:clamp(48px,11vw,170px);line-height:.85;
+  letter-spacing:-.04em;position:relative;user-select:none;white-space:pre;cursor:pointer;
+  color:transparent;-webkit-background-clip:text;background-clip:text;
+  background-image:linear-gradient(100deg,#fff 0%,#fff 38%,var(--c3) 48%,var(--c2) 52%,#fff 62%,#fff 100%);
+  background-size:260% 100%;animation:shine 8s linear infinite;transition:filter .4s}
+@keyframes shine{0%{background-position:100% 0}100%{background-position:-160% 0}}
+h1.alt{background-image:linear-gradient(100deg,var(--c1),var(--c2) 55%,var(--c3));background-size:100% 100%;
+  animation:none;filter:drop-shadow(0 0 22px rgba(255,42,109,.45))}
+.nick{position:relative;display:inline-block}
+/* мигалка: красно-синие вспышки за ником + тонкая «балка» под ним */
+.siren{position:absolute;inset:-35% -12%;z-index:-1;pointer-events:none;mix-blend-mode:screen}
+.siren::before,.siren::after{content:'';position:absolute;top:0;bottom:0;width:58%;filter:blur(34px);opacity:0}
+.siren::before{left:0;background:radial-gradient(ellipse at 62% 50%,rgba(255,25,55,.6),transparent 66%)}
+.siren::after{right:0;background:radial-gradient(ellipse at 38% 50%,rgba(35,90,255,.65),transparent 66%)}
+.led{position:absolute;left:2px;right:2px;bottom:-12px;height:2px;pointer-events:none}
+.led::before,.led::after{content:'';position:absolute;top:0;bottom:0;width:calc(50% - 3px);opacity:.14}
+.led::before{left:0;background:#ff1937;box-shadow:0 0 8px #ff1937}
+.led::after{right:0;background:#2a5cff;box-shadow:0 0 8px #2a5cff}
+.nick.siren-on .siren::before{animation:sR .8s steps(1) infinite}
+.nick.siren-on .siren::after{animation:sB .8s steps(1) infinite}
+.nick.siren-on .led::before{animation:lR .8s steps(1) infinite}
+.nick.siren-on .led::after{animation:lB .8s steps(1) infinite}
+@keyframes sR{0%{opacity:1}10%{opacity:0}20%{opacity:1}30%,100%{opacity:0}}
+@keyframes sB{0%,49%{opacity:0}50%{opacity:1}60%{opacity:0}70%{opacity:1}80%,100%{opacity:0}}
+@keyframes lR{0%{opacity:1}10%{opacity:.14}20%{opacity:1}30%,100%{opacity:.14}}
+@keyframes lB{0%,49%{opacity:.14}50%{opacity:1}60%{opacity:.14}70%{opacity:1}80%,100%{opacity:.14}}
+/* призрак "igor" за ником */
+.ghost{position:absolute;left:-2%;top:50%;z-index:-1;transform:translateY(-50%);pointer-events:none;user-select:none;
+  font-family:'Rubik Mono One',sans-serif;font-size:clamp(90px,20vw,320px);letter-spacing:-.05em;line-height:1;
+  color:var(--c2);filter:blur(8px);opacity:0}
+.nick.reveal .ghost{animation:haunt 4.5s infinite}
+@keyframes haunt{0%{opacity:0;transform:translate(0,-50%) scale(1)}
+  6%{opacity:.16}8%{opacity:.03}10%{opacity:.22;filter:blur(3px)}
+  45%{opacity:.12;transform:translate(3%,-52%) scale(1.04);filter:blur(10px)}
+  75%,100%{opacity:0;transform:translate(5%,-53%) scale(1.06)}}
+/* вертикальная неоновая подпись */
+.aka{position:absolute;white-space:nowrap;left:100%;top:4px;margin-left:14px;writing-mode:vertical-rl;
+  font-size:10px;letter-spacing:.45em;text-transform:uppercase;color:var(--c1);
+  text-shadow:0 0 6px var(--c1),0 0 18px rgba(255,42,109,.6);opacity:0;transition:opacity .25s}
+.nick.reveal .aka{animation:neon 6s infinite}
+.aka i{font-style:normal;color:var(--dim);text-shadow:none}
+@keyframes neon{0%,18%,22%,25%,53%,57%,100%{opacity:1}20%,24%,55%{opacity:.15}}
+h1::before,h1::after{content:attr(data-t);position:absolute;inset:0;opacity:.8;-webkit-text-fill-color:currentColor;background:none}
+h1::before{color:var(--accent);animation:gl1 3.2s infinite steps(1);clip-path:inset(0 0 60% 0)}
+h1::after{color:var(--c3);animation:gl2 2.7s infinite steps(1);clip-path:inset(55% 0 0 0)}
+@keyframes gl1{0%,92%{transform:none;opacity:0}93%{transform:translate(-6px,-2px);opacity:.8}95%{transform:translate(4px,1px)}97%{opacity:0}}
+@keyframes gl2{0%,88%{transform:none;opacity:0}89%{transform:translate(5px,2px);opacity:.7}91%{transform:translate(-3px,0)}93%{opacity:0}}
+.sub{margin-top:22px;font-size:clamp(12px,1.3vw,15px);color:var(--dim);max-width:520px;line-height:1.7}
+.cursor{display:inline-block;width:.6em;height:1em;background:var(--accent);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ---- кнопки ---- */
+nav{display:flex;flex-wrap:wrap;gap:14px;margin-top:44px}
+nav a{--c:12px;position:relative;display:inline-flex;align-items:center;gap:10px;
+  padding:14px 26px;font-size:13px;font-weight:800;letter-spacing:.25em;text-transform:uppercase;
+  color:var(--fg);text-decoration:none;background:rgba(0,0,0,.35);backdrop-filter:blur(4px);
+  border:1px solid rgba(255,255,255,.35);
+  clip-path:polygon(var(--c) 0,100% 0,100% calc(100% - var(--c)),calc(100% - var(--c)) 100%,0 100%,0 var(--c));
+  transition:background .15s,color .15s,border-color .15s}
+nav a svg{width:16px;height:16px;fill:currentColor}
+nav a::after{content:attr(data-n);position:absolute;top:3px;right:16px;font-size:8px;letter-spacing:.1em;color:var(--dim);font-weight:300}
+nav a{box-shadow:inset 2px 0 0 var(--b)}
+nav a svg{color:var(--b)}
+nav a:hover{background:var(--b);color:#000;border-color:var(--b);box-shadow:0 0 24px -4px var(--b);animation:jit .25s steps(2) 1}
+nav a:hover svg{color:#000}
+nav a:hover::after{color:#000}
+nav a:active{filter:brightness(1.3)}
+@keyframes jit{0%{transform:translate(2px,-1px)}50%{transform:translate(-2px,1px)}100%{transform:none}}
+
+/* ---- плеер ---- */
+#player{position:fixed;z-index:4;left:8vw;right:8vw;bottom:32px;display:flex;align-items:center;gap:14px;
+  font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim)}
+.pb,#pp{flex:none;border:1px solid rgba(255,255,255,.3);background:rgba(0,0,0,.4);color:var(--fg);cursor:pointer;
+  display:grid;place-items:center;font:inherit;letter-spacing:.1em;transition:background .15s,color .15s,border-color .15s;
+  clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px)}
+.pb{width:32px;height:32px}
+#pp{width:42px;height:42px;border-color:rgba(255,255,255,.45)}
+.pb:hover,#pp:hover,.pb.on{background:var(--fg);color:#000}
+.pb svg{width:11px;height:11px;fill:currentColor}
+#pp svg{width:14px;height:14px;fill:currentColor}
+.pb.txt{width:auto;padding:0 10px;font-size:10px}
+.meta{flex:1;min-width:0}
+#title{color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+#title em{font-style:normal;color:var(--c3);margin-right:10px}
+/* полоса перемотки: толстая зона клика, тонкая линия */
+#bar{position:relative;height:16px;cursor:pointer;touch-action:none}
+#bar::before{content:'';position:absolute;left:0;right:0;top:7px;height:2px;background:rgba(255,255,255,.15);transition:top .12s,height .12s}
+#bar i{position:absolute;left:0;top:7px;height:2px;width:0;background:linear-gradient(90deg,var(--c3),var(--c2),var(--c1));
+  box-shadow:0 0 10px var(--c2);transition:top .12s,height .12s}
+#bar:hover::before,#bar:hover i,#bar.drag::before,#bar.drag i{top:6px;height:4px}
+#knob{position:absolute;top:4px;width:8px;height:8px;margin-left:-4px;background:#fff;transform:rotate(45deg);
+  opacity:0;transition:opacity .12s;box-shadow:0 0 8px var(--c1)}
+#bar:hover #knob,#bar.drag #knob{opacity:1}
+#tip{position:absolute;bottom:18px;transform:translateX(-50%);padding:3px 7px;font-size:10px;color:var(--fg);
+  background:#000;border:1px solid var(--c2);white-space:nowrap;display:none;pointer-events:none}
+#bar:hover #tip,#bar.drag #tip{display:block}
+#time{flex:none;font-variant-numeric:tabular-nums}
+#vol{flex:none;width:80px;accent-color:var(--c1);cursor:pointer}
+.eq{display:flex;gap:2px;align-items:flex-end;height:14px;flex:none}
+.eq b{width:2px;background:linear-gradient(0deg,var(--c2),var(--c3));animation:eq .8s infinite ease-in-out alternate}
+.eq b:nth-child(2){animation-delay:-.3s}.eq b:nth-child(3){animation-delay:-.6s}.eq b:nth-child(4){animation-delay:-.15s}
+.paused .eq b{animation-play-state:paused;height:2px!important}
+@keyframes eq{0%{height:2px}100%{height:14px}}
+/* меню треков / видео */
+#menu{position:absolute;right:0;bottom:58px;min-width:280px;max-width:420px;max-height:50vh;overflow:auto;
+  background:rgba(0,0,0,.82);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.2);
+  box-shadow:inset 2px 0 0 var(--c2);padding:6px 0;display:none;
+  clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+#menu.open{display:block}
+#menu .mh{padding:6px 16px 8px;font-size:9px;letter-spacing:.4em;color:var(--c3)}
+#menu button{display:block;width:100%;text-align:left;padding:9px 16px;background:none;border:0;color:var(--dim);
+  font:inherit;letter-spacing:.12em;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#menu button:hover{color:#000;background:var(--fg)}
+#menu button.on{color:var(--fg)}
+#menu button.on::before{content:'▶ ';color:var(--c1)}
+#menu button.add{color:var(--c2);border-top:1px solid rgba(255,255,255,.1);margin-top:4px}
+
+/* ---- заставка (нужна, чтобы браузер разрешил звук) ---- */
+#gate{position:fixed;inset:0;z-index:10;background:#000;display:grid;place-items:center;cursor:pointer;transition:opacity .6s}
+#gate.hide{opacity:0;pointer-events:none}
+
+
+#gate small{display:block;text-align:center;margin-top:26px;color:var(--dim);font-size:10px;letter-spacing:.3em}
+
+.corner{position:fixed;z-index:4;top:28px;font-size:10px;letter-spacing:.3em;color:var(--dim);text-transform:uppercase}
+.corner.l{left:8vw}.corner.r{right:8vw}
+
+@media(max-width:640px){#vol,#time{display:none}nav a{padding:12px 18px}}
+#snow{position:absolute;inset:0;width:100%;height:100%}
+#gate>div{position:relative;z-index:1}
+#gate{background:radial-gradient(circle at 50% 50%,rgba(139,92,255,.13),transparent 42%),#000}
+#gate p{position:relative;font-size:13px;letter-spacing:.6em;text-transform:uppercase;color:#ddd;
+  padding:17px 34px 17px calc(34px + .6em);
+  background:
+    linear-gradient(var(--c3),var(--c3)) left top/12px 1px no-repeat,
+    linear-gradient(var(--c3),var(--c3)) left top/1px 12px no-repeat,
+    linear-gradient(var(--c1),var(--c1)) right bottom/12px 1px no-repeat,
+    linear-gradient(var(--c1),var(--c1)) right bottom/1px 12px no-repeat;
+  animation:breathe 3.6s ease-in-out infinite;
+  transition:letter-spacing .4s,padding .4s,color .3s}
+#gate p::after{content:'';position:absolute;left:12px;right:12px;bottom:-12px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--c3),var(--c2),var(--c1),transparent);
+  background-size:220% 100%;animation:sweep 2.8s linear infinite;opacity:.75}
+#gate:hover p{letter-spacing:.85em;padding-left:calc(34px + .85em);color:#fff}
+#gate small{transition:opacity .3s}
+#gate:hover small{opacity:.4}
+@keyframes breathe{0%,100%{text-shadow:0 0 10px rgba(255,255,255,.2)}50%{text-shadow:0 0 18px rgba(139,92,255,.9),0 0 34px rgba(45,226,230,.35)}}
+@keyframes sweep{0%{background-position:120% 0}100%{background-position:-120% 0}}
+@media(max-width:820px){#time,.eq{display:none}}
+</style>
+</head>
+<body>
+
+<div id="gate"><canvas id="snow"></canvas><div><p>enter</p><small>sound on</small></div></div>
+
+<div id="bg"><video id="vid" muted loop playsinline preload="auto"></video></div>
+<audio id="aud" preload="auto"></audio>
+<input type="file" id="fM" accept="audio/*" multiple hidden>
+<input type="file" id="fV" accept="video/*" multiple hidden>
+<div id="shade"></div><div id="fx"></div><div id="grain"></div>
+
+<div class="corner l">// 52.23N 21.01E</div>
+<div class="corner r" id="clock">--:--:--</div>
+
+<main>
+  <div class="tag"><b>■</b> user@root ~ whoami</div>
+  <div class="nick">
+    <span class="siren" aria-hidden="true"></span>
+    <span class="led" aria-hidden="true"></span>
+    <span class="ghost" aria-hidden="true">igor</span>
+    <h1 id="nick" data-t="dawruh.">dawruh.</h1>
+    <span class="aka">a.k.a. <i>—</i> igor</span>
+  </div>
+  <p class="sub"><span>computer engineer</span> / security / warsaw<br>no signal. no noise. <i class="cursor"></i></p>
+
+  <nav>
+    <a href="https://steamcommunity.com/id/YOUR_ID" target="_blank" data-n="01" style="--b:#66c0f4">
+      <svg viewBox="0 0 24 24"><path d="M11.98 0C5.68 0 .52 4.86.04 11.04l6.43 2.66a3.38 3.38 0 0 1 2.13-.6l2.86-4.15v-.06a4.52 4.52 0 1 1 4.52 4.52h-.1l-4.08 2.91c0 .05.01.1.01.16a3.39 3.39 0 0 1-6.72.63L.36 15.27A12 12 0 1 0 11.98 0zM7.54 18.21l-1.47-.61a2.54 2.54 0 1 0 1.39-3.47l1.52.63a1.87 1.87 0 1 1-1.44 3.45zm11.4-9.27a3.02 3.02 0 1 0-3.02 3.02 3.02 3.02 0 0 0 3.02-3.02zm-5.28 0a2.27 2.27 0 1 1 2.27 2.27 2.27 2.27 0 0 1-2.27-2.27z"/></svg>
+      steam</a>
+    <a href="https://t.me/YOUR_USERNAME" target="_blank" data-n="02" style="--b:#2aabee">
+      <svg viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
+      telegram</a>
+    <a href="https://github.com/dawruh" target="_blank" data-n="03" style="--b:#a371f7">
+      <svg viewBox="0 0 24 24"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3"/></svg>
+      github</a>
+    <a href="https://www.linkedin.com/in/YOUR_USERNAME" target="_blank" data-n="04" style="--b:#3d9bff">
+      <svg viewBox="0 0 24 24"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>
+      linkedin</a>
+  </nav>
+</main>
+
+
+<div id="player" class="paused">
+  <button class="pb" id="prev" title="предыдущий трек"><svg viewBox="0 0 24 24"><path d="M6 5h3v14H6zM20 5v14L9 12z"/></svg></button>
+  <button id="pp" title="play / pause (пробел)"><svg viewBox="0 0 24 24"><path id="ppi" d="M6 4l14 8-14 8z"/></svg></button>
+  <button class="pb" id="next" title="следующий трек"><svg viewBox="0 0 24 24"><path d="M15 5h3v14h-3zM4 5v14l11-7z"/></svg></button>
+  <div class="eq"><b></b><b></b><b></b><b></b></div>
+  <div class="meta">
+    <div id="title">loading…</div>
+    <div id="bar"><i></i><span id="knob"></span><span id="tip">0:00</span></div>
+  </div>
+  <span id="time">0:00 / 0:00</span>
+  <button class="pb txt" id="bMus" title="выбрать трек">♪ tracks</button>
+  <button class="pb txt" id="bVid" title="выбрать фон">▣ video</button>
+  <input id="vol" type="range" min="0" max="100" value="10" aria-label="volume">
+  <div id="menu"></div>
+</div>
+
+<script src="playlist.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const aud = $('#aud'), vid = $('#vid');
+const PLAY = 'M6 4l14 8-14 8z', PAUSE = 'M6 4h4v16H6zM14 4h4v16h-4z';
+
+/* ---------- списки ---------- */
+const PL  = window.PLAYLIST || { music: [], videos: [] };
+const enc = p => p.split('/').map(encodeURIComponent).join('/');
+const nm  = p => p.split('/').pop().replace(/\.[^.]+$/, '');
+const tracks = PL.music.map(p => ({ name: nm(p), src: enc(p) }));
+const videos = PL.videos.map(p => ({ name: nm(p), src: enc(p) }));
+const esc = t => t.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const store = {
+  get(k, d){ try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+};
+let ti = 0, vi = 0, menu = null;
+
+function loadTrack(i, play){
+  if (!tracks.length){ $('#title').textContent = 'нет музыки — запусти setup.bat'; return; }
+  ti = (i + tracks.length) % tracks.length;
+  aud.src = tracks[ti].src;
+  $('#title').innerHTML = `<em>${String(ti+1).padStart(2,'0')}/${String(tracks.length).padStart(2,'0')}</em>${esc(tracks[ti].name)}`;
+  store.set('ti', ti);
+  if (play) aud.play().catch(()=>{});
+  renderMenu();
+}
+function loadVideo(i){
+  if (!videos.length) return;
+  vi = (i + videos.length) % videos.length;
+  vid.src = videos[vi].src;
+  vid.play().catch(()=>{});
+  store.set('vname', videos[vi].name);
+  renderMenu();
+}
+
+/* ---------- плеер ---------- */
+aud.volume = 0.10;                      // громкость при входе
+aud.onplay  = () => { $('#ppi').setAttribute('d', PAUSE); $('#player').classList.remove('paused'); };
+aud.onpause = () => { $('#ppi').setAttribute('d', PLAY);  $('#player').classList.add('paused'); };
+aud.onended = () => loadTrack(ti + 1, true);
+aud.onerror = () => { if (aud.src) $('#title').textContent = 'не открывается: ' + (tracks[ti]?.name || '?'); };
+
+$('#pp').onclick   = () => aud.paused ? aud.play() : aud.pause();
+$('#next').onclick = () => loadTrack(ti + 1, true);
+$('#prev').onclick = () => aud.currentTime > 3 ? (aud.currentTime = 0) : loadTrack(ti - 1, true);
+$('#vol').oninput  = e => aud.volume = e.target.value / 100;
+
+const fmt = (s, fine) => {
+  s = Math.max(0, s || 0);
+  const m = Math.floor(s / 60), sec = s - m * 60;
+  return m + ':' + (fine ? sec.toFixed(1).padStart(4, '0') : String(Math.floor(sec)).padStart(2, '0'));
+};
+function paint(){
+  const c = aud.currentTime, t = aud.duration, p = t ? c / t * 100 : 0;
+  $('#bar i').style.width = p + '%';
+  $('#knob').style.left = p + '%';
+  $('#time').textContent = fmt(c) + ' / ' + fmt(t);
+}
+setInterval(paint, 100);
+
+/* перемотка: клик, перетаскивание, колесо, стрелки */
+const bar = $('#bar'), tip = $('#tip');
+let drag = false;
+const frac = e => { const r = bar.getBoundingClientRect(); return Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)); };
+const seek = p => { if (aud.duration){ aud.currentTime = p * aud.duration; paint(); } };
+const nudge = d => { if (aud.duration){ aud.currentTime = Math.min(aud.duration, Math.max(0, aud.currentTime + d)); paint(); } };
+bar.onpointerdown = e => { drag = true; bar.classList.add('drag'); bar.setPointerCapture(e.pointerId); seek(frac(e)); };
+bar.onpointermove = e => {
+  const p = frac(e);
+  tip.style.left = p * 100 + '%';
+  tip.textContent = fmt(p * (aud.duration || 0), true);
+  if (drag) seek(p);
+};
+bar.onpointerup = bar.onpointercancel = () => { drag = false; bar.classList.remove('drag'); };
+bar.addEventListener('wheel', e => { e.preventDefault(); nudge(e.deltaY > 0 ? -2 : 2); }, { passive: false });
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.code === 'Space'){ e.preventDefault(); $('#pp').click(); }
+  if (e.code === 'ArrowRight') nudge(e.shiftKey ? 1 : 5);
+  if (e.code === 'ArrowLeft')  nudge(e.shiftKey ? -1 : -5);
+  if (e.code === 'KeyN') $('#next').click();
+  if (e.code === 'KeyP') $('#prev').click();
+  if (e.code === 'Escape'){ menu = null; renderMenu(); }
+});
+
+/* ---------- меню треков / видео ---------- */
+function renderMenu(){
+  const m = $('#menu');
+  $('#bMus').classList.toggle('on', menu === 'm');
+  $('#bVid').classList.toggle('on', menu === 'v');
+  if (!menu){ m.classList.remove('open'); return; }
+  const list = menu === 'm' ? tracks : videos, cur = menu === 'm' ? ti : vi;
+  m.innerHTML = `<div class="mh">// ${menu === 'm' ? 'tracks' : 'background'}</div>`
+    + (list.length ? '' : '<div class="mh" style="color:var(--dim)">пусто</div>')
+    + list.map((x, i) => `<button data-i="${i}" class="${i === cur ? 'on' : ''}">${String(i+1).padStart(2,'0')}  ${esc(x.name)}</button>`).join('')
+    + `<button class="add" data-add>+ файл с компа</button>`;
+  m.classList.add('open');
+}
+$('#bMus').onclick = e => { e.stopPropagation(); menu = menu === 'm' ? null : 'm'; renderMenu(); };
+$('#bVid').onclick = e => { e.stopPropagation(); menu = menu === 'v' ? null : 'v'; renderMenu(); };
+$('#menu').onclick = e => {
+  e.stopPropagation();
+  const b = e.target.closest('button'); if (!b) return;
+  if ('add' in b.dataset) return (menu === 'm' ? $('#fM') : $('#fV')).click();
+  menu === 'm' ? loadTrack(+b.dataset.i, true) : loadVideo(+b.dataset.i);
+};
+document.addEventListener('click', e => { if (menu && !e.target.closest('#player')){ menu = null; renderMenu(); } });
+
+function addFiles(input, list, load){
+  const start = list.length;
+  for (const f of input.files) list.push({ name: f.name.replace(/\.[^.]+$/, ''), src: URL.createObjectURL(f) });
+  input.value = '';
+  if (list.length > start) load(start);
+}
+$('#fM').onchange = e => addFiles(e.target, tracks, i => loadTrack(i, true));
+$('#fV').onchange = e => addFiles(e.target, videos, loadVideo);
+
+/* старт: фон крутится сразу, музыка — после ENTER */
+const DEFAULT_VIDEO = 'main';          // фон по умолчанию (имя файла в videos/)
+let v0 = videos.findIndex(v => v.name === store.get('vname', DEFAULT_VIDEO));
+if (v0 < 0) v0 = videos.findIndex(v => v.name === DEFAULT_VIDEO);
+loadVideo(Math.max(0, v0));
+loadTrack(Math.min(store.get('ti', 0), Math.max(0, tracks.length - 1)), false);
+
+/* ---------- снег на заставке ---------- */
+const cv = $('#snow'), cx = cv.getContext('2d'), dpr = devicePixelRatio || 1;
+let W, H, snowOn = true;
+const rs = () => { W = cv.width = innerWidth * dpr; H = cv.height = innerHeight * dpr; };
+rs(); addEventListener('resize', rs);
+const flake = top => ({
+  x: Math.random() * W, y: top ? -10 : Math.random() * H * .8,
+  r: (Math.random() * 1.8 + .5) * dpr, v: (Math.random() * .7 + .25) * dpr,
+  s: Math.random() * 6.28, w: Math.random() * .02 + .005, a: Math.random() * .5 + .5
+});
+const flakes = Array.from({ length: 170 }, () => flake(false));
+(function snow(){
+  if (!snowOn) return;
+  cx.clearRect(0, 0, W, H);
+  cx.fillStyle = '#fff';
+  for (const f of flakes){
+    f.y += f.v; f.s += f.w; f.x += Math.sin(f.s) * .5 * dpr;
+    const fade = Math.max(0, 1 - f.y / (H * .92));      // тает к низу экрана
+    cx.globalAlpha = f.a * Math.pow(fade, 1.6);
+    cx.beginPath(); cx.arc(f.x, f.y, f.r, 0, 6.29); cx.fill();
+    if (fade <= 0) Object.assign(f, flake(true));
+  }
+  requestAnimationFrame(snow);
+})();
+
+$('#gate').onclick = () => {
+  $('#gate').classList.add('hide');
+  aud.play().catch(()=>{});
+  vid.play().catch(()=>{});
+  setTimeout(() => snowOn = false, 800);
+};
+
+/* ---------- часы ---------- */
+setInterval(() => $('#clock').textContent = new Date().toTimeString().slice(0,8) + ' CET', 1000);
+
+/* ---------- ник ---------- */
+const nick = $('#nick'), NICK = 'dawruh.', ALT = 'igor';
+const CH = '!<>-_/[]{}=+*^?#01x$%';
+function scramble(to){
+  return new Promise(res => {
+    const from = nick.textContent, len = Math.max(from.length, to.length);
+    const tgt = to.padEnd(len, '\u00a0');
+    const q = [...Array(len)].map(() => { const s = Math.random()*14|0; return { s, e: s + 8 + (Math.random()*14|0) }; });
+    let f = 0;
+    (function tick(){
+      let out = '', done = 0;
+      for (let i = 0; i < len; i++){
+        if (f >= q[i].e){ out += tgt[i]; done++; }
+        else if (f >= q[i].s) out += CH[Math.random()*CH.length|0];
+        else out += from[i] || '\u00a0';
+      }
+      nick.textContent = out; nick.dataset.t = out;
+      if (done === len) res(); else { f++; setTimeout(tick, 32); }
+    })();
+  });
+}
+/* «рассекречивание»: igor + мигалка только пока курсор на нике */
+const wrap = nick.parentElement;
+let hovered = false, shown = 'nick', running = false;
+async function reveal(){
+  if (running) return; running = true;
+  while ((hovered ? 'alt' : 'nick') !== shown){
+    if (hovered){
+      wrap.classList.add('reveal', 'siren-on'); nick.classList.add('alt');
+      await scramble(ALT); shown = 'alt';
+    } else {
+      wrap.classList.remove('reveal', 'siren-on');
+      await scramble(NICK); nick.classList.remove('alt'); shown = 'nick';
+    }
+  }
+  running = false;
+}
+wrap.addEventListener('mouseenter', () => { hovered = true;  reveal(); });
+wrap.addEventListener('mouseleave', () => { hovered = false; wrap.classList.remove('reveal', 'siren-on'); reveal(); });
+</script>
+</body>
+</html>
