@@ -5,11 +5,11 @@ window.SITE = {
   "aka": "a.k.a. — igor",
   "tag": "user@root ~ whoami",
   "subAccent": "computer engineer",
-  "subRest": "/ security / warsaw",
+  "subRest": "/ security / larp enthusiast",
   "sub2": "no signal. no noise.",
   "coords": "// 52.23N 21.01E",
   "gateText": "enter",
-  "gateSub": "sound on",
+  "gateSub": "sound on. be careful",
   "volume": 8,
   "dark": 0.72,
   "colors": {
