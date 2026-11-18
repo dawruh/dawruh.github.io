@@ -10,22 +10,62 @@ window.SITE = {
   "coords": "// 52.23N 21.01E",
   "gateText": "enter",
   "gateSub": "sound on",
-  "volume": 10,
+  "volume": 8,
   "dark": 0.72,
-  "colors": { "c1": "#ff2a6d", "c2": "#8b5cff", "c3": "#2de2e6" },
+  "colors": {
+    "c1": "#ff2a6d",
+    "c2": "#8b5cff",
+    "c3": "#2de2e6"
+  },
   "links": [
-    { "label": "steam",    "url": "https://steamcommunity.com/id/dawruh", "icon": "steam",    "color": "#66c0f4" },
-    { "label": "telegram", "url": "https://t.me/dawruh",                  "icon": "telegram", "color": "#2aabee" },
-    { "label": "github",   "url": "",                                     "icon": "github",   "color": "#a371f7" },
-    { "label": "linkedin", "url": "",                                     "icon": "linkedin", "color": "#3d9bff" }
+    {
+      "label": "steam",
+      "url": "https://steamcommunity.com/id/dawruh",
+      "icon": "steam",
+      "color": "#66c0f4"
+    },
+    {
+      "label": "telegram",
+      "url": "https://t.me/dawruh",
+      "icon": "telegram",
+      "color": "#2aabee"
+    },
+    {
+      "label": "github",
+      "url": "",
+      "icon": "github",
+      "color": "#a371f7"
+    },
+    {
+      "label": "linkedin",
+      "url": "",
+      "icon": "linkedin",
+      "color": "#3d9bff"
+    }
   ],
   "music": [
-    { "src": "music/Boohavin - Deja Vu.m4a", "title": "Boohavin - Deja Vu", "enabled": true },
-    { "src": "music/Travy, Boohavin - Keep Up.m4a", "title": "Travy, Boohavin - Keep Up", "enabled": true }
+    {
+      "src": "music/Boohavin - Deja Vu.m4a",
+      "title": "Boohavin - Deja Vu",
+      "enabled": true
+    },
+    {
+      "src": "music/Travy, Boohavin - Keep Up.m4a",
+      "title": "Travy, Boohavin - Keep Up",
+      "enabled": true
+    }
   ],
   "videos": [
-    { "src": "videos/main.mp4", "title": "main", "enabled": true },
-    { "src": "videos/bg.mp4", "title": "bg", "enabled": true }
+    {
+      "src": "videos/main.mp4",
+      "title": "main",
+      "enabled": true
+    },
+    {
+      "src": "videos/bg.mp4",
+      "title": "bg",
+      "enabled": true
+    }
   ],
   "defaultVideo": "videos/main.mp4"
 };
