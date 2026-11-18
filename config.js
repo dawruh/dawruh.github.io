@@ -45,13 +45,13 @@ window.SITE = {
   ],
   "music": [
     {
-      "src": "music/Boohavin - Deja Vu.m4a",
-      "title": "Boohavin - Deja Vu",
+      "src": "music/Travy, Boohavin - Keep Up.m4a",
+      "title": "Travy, Boohavin - Keep Up",
       "enabled": true
     },
     {
-      "src": "music/Travy, Boohavin - Keep Up.m4a",
-      "title": "Travy, Boohavin - Keep Up",
+      "src": "music/Boohavin - Deja Vu.m4a",
+      "title": "Boohavin - Deja Vu",
       "enabled": true
     }
   ],
