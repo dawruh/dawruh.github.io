@@ -285,18 +285,61 @@ nav a:active{filter:brightness(1.3)}
   <div id="menu"></div>
 </div>
 
-<script src="playlist.js"></script>
+<script>/* настройки сайта (меняются через /admin) */
+document.write('<script src="config.js?v=' + Date.now() + '"><\/script>');</script>
 <script>
 const $ = s => document.querySelector(s);
 const aud = $('#aud'), vid = $('#vid');
 const PLAY = 'M6 4l14 8-14 8z', PAUSE = 'M6 4h4v16H6zM14 4h4v16h-4z';
 
 /* ---------- списки ---------- */
+/* ---------- применяем настройки из config.js ---------- */
+const PREVIEW = /[?&]preview/.test(location.search);
+const C = (() => {           // ?preview — показать несохранённые правки из /admin (только в этом браузере)
+  if (PREVIEW) try { const p = JSON.parse(localStorage.getItem('site_preview')); if (p) return p; } catch {}
+  return window.SITE || {};
+})();
+if (PREVIEW) document.body.insertAdjacentHTML('beforeend', '<div style="position:fixed;z-index:20;top:0;left:50%;transform:translateX(-50%);background:#ff2a6d;color:#000;font-size:10px;letter-spacing:.3em;padding:3px 12px">PREVIEW</div>');
+const HE = t => String(t ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ICONS = {
+  steam: 'M11.98 0C5.68 0 .52 4.86.04 11.04l6.43 2.66a3.38 3.38 0 0 1 2.13-.6l2.86-4.15v-.06a4.52 4.52 0 1 1 4.52 4.52h-.1l-4.08 2.91c0 .05.01.1.01.16a3.39 3.39 0 0 1-6.72.63L.36 15.27A12 12 0 1 0 11.98 0zM7.54 18.21l-1.47-.61a2.54 2.54 0 1 0 1.39-3.47l1.52.63a1.87 1.87 0 1 1-1.44 3.45zm11.4-9.27a3.02 3.02 0 1 0-3.02 3.02 3.02 3.02 0 0 0 3.02-3.02zm-5.28 0a2.27 2.27 0 1 1 2.27 2.27 2.27 2.27 0 0 1-2.27-2.27z',
+  telegram: 'M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z',
+  github: 'M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3',
+  linkedin: 'M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z',
+  mail: 'M2 4h20v16H2zm2 2v.4l8 5.2 8-5.2V6zm0 2.8V18h16V8.8l-8 5.2z',
+  link: 'M10.6 13.4a1 1 0 0 1 0-1.4l3.4-3.4a1 1 0 1 1 1.4 1.4L12 13.4a1 1 0 0 1-1.4 0zM8.5 20.5a5 5 0 0 1-3.5-8.5l2.1-2.1a1 1 0 1 1 1.4 1.4l-2.1 2.1a3 3 0 0 0 4.2 4.2l2.1-2.1a1 1 0 1 1 1.4 1.4L12 19a5 5 0 0 1-3.5 1.5zm8.4-6.8a1 1 0 0 1-.7-1.7l2.1-2.1a3 3 0 0 0-4.2-4.2L12 7.8a1 1 0 1 1-1.4-1.4L12.7 4.3a5 5 0 0 1 7 7l-2.1 2.1a1 1 0 0 1-.7.3z',
+  none: ''
+};
+(function applyConfig(){
+  const R = document.documentElement.style;
+  if (C.title) document.title = C.title;
+  if (C.colors) for (const k of ['c1','c2','c3']) if (C.colors[k]) R.setProperty('--' + k, C.colors[k]);
+  if (C.colors?.c1) R.setProperty('--accent', C.colors.c1);
+  if (C.dark != null) R.setProperty('--dark', C.dark);
+  if (C.coords != null) $('.corner.l').textContent = C.coords;
+  if (C.tag != null) $('.tag').innerHTML = '<b>■</b> ' + HE(C.tag);
+  if (C.aka != null) $('.aka').textContent = C.aka;
+  if (C.subAccent != null || C.subRest != null || C.sub2 != null)
+    $('.sub').innerHTML = `<span>${HE(C.subAccent)}</span> ${HE(C.subRest)}<br>${HE(C.sub2)} <i class="cursor"></i>`;
+  if (C.gateText != null) $('#gate p').textContent = C.gateText;
+  if (C.gateSub != null) $('#gate small').textContent = C.gateSub;
+  if (C.volume != null) $('#vol').value = C.volume;
+  if (Array.isArray(C.links)) $('nav').innerHTML = C.links.map((l, i) => {
+    const attrs = l.url ? `href="${HE(l.url)}" target="_blank" rel="noopener"` : 'role="button" tabindex="0"';
+    const icon = ICONS[l.icon] ? `<svg viewBox="0 0 24 24"><path d="${ICONS[l.icon]}"/></svg>` : '';
+    return `<a ${attrs} data-n="${String(i+1).padStart(2,'0')}" style="--b:${HE(l.color || '#e9e9e9')}">${icon}${HE(l.label)}</a>`;
+  }).join('');
+})();
+
+const DEF_VIDEO = C.defaultVideo || 'videos/main.mp4';
 const PL  = window.PLAYLIST || { music: [], videos: [] };
 const enc = p => p.split('/').map(encodeURIComponent).join('/');
 const nm  = p => p.split('/').pop().replace(/\.[^.]+$/, '');
-const tracks = PL.music.map(p => ({ name: nm(p), src: enc(p) }));
-const videos = PL.videos.map(p => ({ name: nm(p), src: enc(p) }));
+const item = m => typeof m === 'string' ? { name: nm(m), src: enc(m), path: m }
+                                        : { name: m.title || nm(m.src), src: enc(m.src), path: m.src };
+const on = m => typeof m === 'string' || m.enabled !== false;
+const tracks = (C.music  || PL.music ).filter(on).map(item);
+const videos = (C.videos || PL.videos).filter(on).map(item);
 const esc = t => t.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const store = {
   get(k, d){ try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } },
@@ -318,12 +361,12 @@ function loadVideo(i){
   vi = (i + videos.length) % videos.length;
   vid.src = videos[vi].src;
   vid.play().catch(()=>{});
-  store.set('vname', videos[vi].name);
+  store.set('vsel', [videos[vi].path, DEF_VIDEO]);
   renderMenu();
 }
 
 /* ---------- плеер ---------- */
-aud.volume = 0.10;                      // громкость при входе
+aud.volume = $('#vol').value / 100;     // громкость при входе (из настроек)
 aud.onplay  = () => { $('#ppi').setAttribute('d', PAUSE); $('#player').classList.remove('paused'); };
 aud.onpause = () => { $('#ppi').setAttribute('d', PLAY);  $('#player').classList.add('paused'); };
 aud.onended = () => loadTrack(ti + 1, true);
@@ -406,9 +449,10 @@ $('#fM').onchange = e => addFiles(e.target, tracks, i => loadTrack(i, true));
 $('#fV').onchange = e => addFiles(e.target, videos, loadVideo);
 
 /* старт: фон крутится сразу, музыка — после ENTER */
-const DEFAULT_VIDEO = 'main';          // фон по умолчанию (имя файла в videos/)
-let v0 = videos.findIndex(v => v.name === store.get('vname', DEFAULT_VIDEO));
-if (v0 < 0) v0 = videos.findIndex(v => v.name === DEFAULT_VIDEO);
+// фон по умолчанию задаётся в /admin; выбор посетителя помнится, пока админ не сменит дефолт
+const sel = store.get('vsel', null);
+let v0 = sel && sel[1] === DEF_VIDEO ? videos.findIndex(v => v.path === sel[0]) : -1;
+if (v0 < 0) v0 = videos.findIndex(v => v.path === DEF_VIDEO);
 loadVideo(Math.max(0, v0));
 loadTrack(Math.min(store.get('ti', 0), Math.max(0, tracks.length - 1)), false);
 
@@ -448,7 +492,9 @@ $('#gate').onclick = () => {
 setInterval(() => $('#clock').textContent = new Date().toTimeString().slice(0,8) + ' CET', 1000);
 
 /* ---------- ник ---------- */
-const nick = $('#nick'), NICK = 'dawruh.', ALT = 'igor';
+const nick = $('#nick'), NICK = C.nick || 'dawruh.', ALT = C.alt || 'igor';
+nick.textContent = nick.dataset.t = NICK;
+$('.ghost').textContent = ALT;
 const CH = '!<>-_/[]{}=+*^?#01x$%';
 function scramble(to){
   return new Promise(res => {

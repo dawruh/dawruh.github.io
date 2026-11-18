@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>// admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&family=JetBrains+Mono:wght@300;500;800&display=swap" rel="stylesheet">
+<style>
+:root{--fg:#e9e9e9;--dim:#8a8a8a;--line:rgba(255,255,255,.14);--c1:#ff2a6d;--c2:#8b5cff;--c3:#2de2e6;--ok:#3ddc97}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#07070a;color:var(--fg);font:13px/1.5 'JetBrains Mono',monospace;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;opacity:.25;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.6) 0 1px,transparent 1px 3px)}
+a{color:var(--c3)}
+h1{font-family:'Rubik Mono One',sans-serif;font-size:22px;letter-spacing:-.02em}
+h1 span{color:var(--c1)}
+h2{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:var(--c3);margin:0 0 16px;font-weight:500}
+.wrap{max-width:980px;margin:0 auto;padding:28px 22px 120px;position:relative}
+.cut{clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+button,.btn{font:inherit;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--fg);background:rgba(255,255,255,.04);
+  border:1px solid var(--line);padding:9px 14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+  clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);transition:.15s}
+button:hover,.btn:hover{background:var(--fg);color:#000}
+button.pri{border-color:var(--c2);box-shadow:inset 2px 0 0 var(--c2)}
+button.pri.dirty{background:var(--c1);border-color:var(--c1);color:#000}
+button.danger:hover{background:var(--c1);color:#000}
+button.ico{padding:7px 9px;letter-spacing:0}
+button:disabled{opacity:.35;pointer-events:none}
+input,select,textarea{font:inherit;color:var(--fg);background:rgba(0,0,0,.5);border:1px solid var(--line);padding:9px 11px;width:100%;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--c2)}
+input[type=checkbox],input[type=radio]{width:auto;accent-color:var(--c1)}
+input[type=color]{padding:2px;height:38px;width:60px;cursor:pointer}
+input[type=range]{padding:0;accent-color:var(--c1)}
+label.f{display:block;margin-bottom:14px}
+label.f>span{display:block;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+label.f small{display:block;color:var(--dim);font-size:10px;margin-top:4px;letter-spacing:.05em}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
+.card{border:1px solid var(--line);background:rgba(255,255,255,.02);padding:22px;margin-bottom:22px;box-shadow:inset 2px 0 0 var(--c2)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.muted{color:var(--dim)}
+/* верхняя панель */
+.top{position:sticky;top:0;z-index:5;background:rgba(7,7,10,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top .in{max-width:980px;margin:0 auto;padding:14px 22px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.top .sp{flex:1}
+#status{font-size:11px;color:var(--dim);min-height:16px}
+#status.ok{color:var(--ok)}#status.err{color:var(--c1)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:22px 0}
+.tabs button.on{background:var(--fg);color:#000}
+.pane{display:none}.pane.on{display:block}
+/* списки */
+.list{display:flex;flex-direction:column;gap:8px}
+.item{display:grid;gap:8px;align-items:center;border:1px solid var(--line);padding:10px;background:rgba(0,0,0,.3)}
+.item.off{opacity:.45}
+.links .item{grid-template-columns:1.1fr 2fr 120px 52px auto}
+.media .item{grid-template-columns:auto 1.4fr 1.2fr auto}
+.media .file{font-size:10px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.media .file b{color:var(--fg);font-weight:500}
+.tagd{font-size:9px;letter-spacing:.2em;color:#000;background:var(--c3);padding:1px 6px;margin-left:6px}
+.prog{height:2px;background:var(--line);margin-top:10px;display:none}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--c3),var(--c2),var(--c1))}
+.prev{margin-top:12px;display:none}
+.prev video,.prev audio{width:100%;max-height:260px;background:#000}
+textarea{min-height:420px;font-size:12px;line-height:1.5;resize:vertical}
+/* вход */
+#login{max-width:560px;margin:10vh auto 0}
+#login ol{margin:12px 0 18px 18px;color:var(--dim)}
+#login ol li{margin-bottom:6px}
+#login ol b{color:var(--fg);font-weight:500}
+@media(max-width:720px){
+  .grid{grid-template-columns:1fr}
+  .links .item{grid-template-columns:1fr 1fr}
+  .links .item .url{grid-column:1/-1;order:-1}
+  .media .item{grid-template-columns:auto 1fr}
+  .media .item .ttl{grid-column:1/-1}
+  .media .item .act{grid-column:1/-1}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== ВХОД ===================== -->
+<div class="wrap" id="login">
+  <h1>dawruh<span>.</span> admin</h1>
+  <p class="muted" style="margin-top:10px">Панель меняет файлы сайта в репозитории <b>dawruh/dawruh.github.io</b>. Для входа нужен личный GitHub-токен с доступом только к этому репозиторию.</p>
+  <ol>
+    <li>Открой <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a></li>
+    <li><b>Repository access</b> → Only select repositories → <b>dawruh.github.io</b></li>
+    <li><b>Permissions → Repository permissions → Contents</b> → Read and write</li>
+    <li>Нажми <b>Generate token</b>, скопируй и вставь сюда</li>
+  </ol>
+  <div class="card">
+    <label class="f"><span>GitHub token</span><input id="tok" type="password" placeholder="github_pat_…" autocomplete="off"></label>
+    <div class="row" style="justify-content:space-between">
+      <label class="row muted" style="font-size:11px"><input type="checkbox" id="remember" checked> запомнить на этом устройстве</label>
+      <button class="pri" id="loginBtn">войти</button>
+    </div>
+    <div id="loginErr" style="color:var(--c1);margin-top:12px;font-size:11px"></div>
+  </div>
+  <p class="muted" style="font-size:10px">Токен хранится только в этом браузере и отправляется только на api.github.com.</p>
+</div>
+
+<!-- ===================== ПАНЕЛЬ ===================== -->
+<div id="app" hidden>
+  <div class="top"><div class="in">
+    <h1>dawruh<span>.</span> admin</h1>
+    <div class="sp"></div>
+    <a class="btn" href="../" target="_blank" rel="noopener">сайт ↗</a>
+    <button id="previewBtn" title="Открыть сайт с несохранёнными изменениями (видишь только ты)">предпросмотр</button>
+    <button class="pri" id="saveBtn">сохранить</button>
+    <button id="logoutBtn" title="Выйти и забыть токен">выйти</button>
+  </div>
+  <div class="in" style="padding-top:0"><div id="status"></div></div></div>
+
+  <div class="wrap">
+    <div class="tabs" id="tabs">
+      <button data-p="texts" class="on">тексты</button>
+      <button data-p="look">вид</button>
+      <button data-p="links">кнопки</button>
+      <button data-p="music">музыка</button>
+      <button data-p="videos">видео</button>
+      <button data-p="json">json</button>
+    </div>
+
+    <!-- тексты -->
+    <section class="pane on" id="p-texts">
+      <div class="card"><h2>// ник</h2><div class="grid">
+        <label class="f"><span>ник</span><input data-k="nick"></label>
+        <label class="f"><span>имя при наведении</span><input data-k="alt"><small>появляется вместо ника + мигалка</small></label>
+        <label class="f"><span>неоновая подпись</span><input data-k="aka"></label>
+        <label class="f"><span>строка над ником</span><input data-k="tag"></label>
+      </div></div>
+      <div class="card"><h2>// подзаголовок</h2><div class="grid">
+        <label class="f"><span>цветная часть</span><input data-k="subAccent"></label>
+        <label class="f"><span>продолжение строки</span><input data-k="subRest"></label>
+        <label class="f"><span>вторая строка</span><input data-k="sub2"></label>
+        <label class="f"><span>текст в левом углу</span><input data-k="coords"></label>
+      </div></div>
+      <div class="card"><h2>// заставка и вкладка</h2><div class="grid">
+        <label class="f"><span>кнопка входа</span><input data-k="gateText"></label>
+        <label class="f"><span>подпись под кнопкой</span><input data-k="gateSub"></label>
+        <label class="f"><span>заголовок вкладки</span><input data-k="title"></label>
+      </div></div>
+    </section>
+
+    <!-- вид -->
+    <section class="pane" id="p-look">
+      <div class="card"><h2>// цвета</h2>
+        <div class="row" style="gap:22px">
+          <label class="f"><span>розовый (c1)</span><input type="color" data-c="c1"></label>
+          <label class="f"><span>фиолет (c2)</span><input type="color" data-c="c2"></label>
+          <label class="f"><span>циан (c3)</span><input type="color" data-c="c3"></label>
+          <button id="resetColors" style="margin-top:6px">вернуть исходные</button>
+        </div>
+      </div>
+      <div class="card"><h2>// фон и звук</h2><div class="grid">
+        <label class="f"><span>затемнение видео: <b id="darkV"></b></span><input type="range" min="0" max="0.95" step="0.01" data-k="dark" data-num></label>
+        <label class="f"><span>громкость при входе: <b id="volV"></b>%</span><input type="range" min="0" max="100" step="1" data-k="volume" data-num></label>
+      </div></div>
+    </section>
+
+    <!-- кнопки -->
+    <section class="pane links" id="p-links">
+      <div class="card"><h2>// кнопки-ссылки</h2>
+        <p class="muted" style="margin-bottom:14px;font-size:11px">Пустая ссылка = кнопка-болванка без перехода.</p>
+        <div class="list" id="linkList"></div>
+        <button style="margin-top:14px" id="addLink">+ кнопка</button>
+      </div>
+    </section>
+
+    <!-- музыка / видео -->
+    <section class="pane media" id="p-music">
+      <div class="card"><h2>// треки</h2>
+        <div class="list" id="musicList"></div>
+        <div class="row" style="margin-top:14px">
+          <button id="upMusic">+ загрузить трек</button>
+          <span class="muted" style="font-size:10px">mp3 / m4a / ogg, до 95 МБ</span>
+        </div>
+        <div class="prog" id="progMusic"><i></i></div>
+        <div class="prev" id="prevMusic"></div>
+      </div>
+    </section>
+    <section class="pane media" id="p-videos">
+      <div class="card"><h2>// фоновые видео</h2>
+        <p class="muted" style="margin-bottom:14px;font-size:11px">◉ — фон по умолчанию. Звук у видео на сайте всегда выключен.</p>
+        <div class="list" id="videosList"></div>
+        <div class="row" style="margin-top:14px">
+          <button id="upVideos">+ загрузить видео</button>
+          <span class="muted" style="font-size:10px">mp4 / webm, до 95 МБ (лучше 720p, до 50 МБ)</span>
+        </div>
+        <div class="prog" id="progVideos"><i></i></div>
+        <div class="prev" id="prevVideos"></div>
+      </div>
+    </section>
+
+    <!-- json -->
+    <section class="pane" id="p-json">
+      <div class="card"><h2>// все настройки как json</h2>
+        <textarea id="json" spellcheck="false"></textarea>
+        <div class="row" style="margin-top:12px"><button id="applyJson">применить json</button><span class="muted" style="font-size:10px">потом «сохранить»</span></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<input type="file" id="fileMusic" accept="audio/*" hidden>
+<input type="file" id="fileVideos" accept="video/mp4,video/webm" hidden>
+
+<script>
+const REPO = 'dawruh/dawruh.github.io', BRANCH = 'main';
+const API = 'https://api.github.com/repos/' + REPO;
+const MAX = 95 * 1024 * 1024;
+const ICONS = ['steam','telegram','github','linkedin','mail','link','none'];
+const DEF_COLORS = { c1:'#ff2a6d', c2:'#8b5cff', c3:'#2de2e6' };
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const H = t => String(t ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+let token = '', cfg = {}, cfgSha = null, dirty = false, files = { music: {}, videos: {} };
+
+/* ---------- статус ---------- */
+function status(msg, kind){ const s = $('#status'); s.textContent = msg; s.className = kind || ''; }
+function setDirty(v){ dirty = v; $('#saveBtn').classList.toggle('dirty', v); $('#saveBtn').textContent = v ? 'сохранить •' : 'сохранить'; }
+addEventListener('beforeunload', e => { if (dirty){ e.preventDefault(); e.returnValue = ''; } });
+
+/* ---------- GitHub API ---------- */
+const cpath = p => '/contents/' + p.split('/').map(encodeURIComponent).join('/');
+const hdr = () => ({ Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' });
+async function gh(path, opt = {}){
+  const r = await fetch(API + path, { ...opt, headers: { ...hdr(), ...(opt.headers || {}) } });
+  if (!r.ok){ let m = ''; try { m = (await r.json()).message; } catch {} const e = new Error(r.status + ' ' + (m || r.statusText)); e.status = r.status; throw e; }
+  return r.status === 204 ? null : r.json();
+}
+function put(path, b64, sha, message, onProg){
+  return new Promise((res, rej) => {
+    const x = new XMLHttpRequest();
+    x.open('PUT', API + cpath(path));
+    for (const [k, v] of Object.entries(hdr())) x.setRequestHeader(k, v);
+    x.upload.onprogress = e => e.lengthComputable && onProg && onProg(e.loaded / e.total);
+    x.onload = () => {
+      let j = {}; try { j = JSON.parse(x.responseText); } catch {}
+      if (x.status < 300) res(j); else { const e = new Error(x.status + ' ' + (j.message || '')); e.status = x.status; rej(e); }
+    };
+    x.onerror = () => rej(new Error('нет сети'));
+    x.send(JSON.stringify({ message, content: b64, branch: BRANCH, ...(sha ? { sha } : {}) }));
+  });
+}
+const enc64 = str => { const b = new TextEncoder().encode(str); let s = ''; for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode(...b.subarray(i, i + 0x8000)); return btoa(s); };
+const dec64 = b64 => new TextDecoder().decode(Uint8Array.from(atob(b64.replace(/\s/g, '')), c => c.charCodeAt(0)));
+const fileB64 = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = rej; r.readAsDataURL(f); });
+const mb = n => (n / 1048576).toFixed(1) + ' МБ';
+
+/* ---------- вход ---------- */
+async function login(t, remember){
+  token = t.trim();
+  $('#loginErr').textContent = '';
+  try {
+    const repo = await gh('');
+    if (!repo.permissions?.push) throw new Error('у токена нет права записи (Contents: Read and write)');
+    (remember ? localStorage : sessionStorage).setItem('gh_token', token);
+    $('#login').hidden = true; $('#app').hidden = false;
+    await loadAll();
+  } catch (e){
+    token = ''; localStorage.removeItem('gh_token'); sessionStorage.removeItem('gh_token');
+    $('#login').hidden = false; $('#app').hidden = true;
+    $('#loginErr').textContent = e.status === 401 ? 'токен неверный или истёк' : e.status === 404 ? 'токен не видит репозиторий dawruh.github.io' : 'ошибка: ' + e.message;
+  }
+}
+$('#loginBtn').onclick = () => login($('#tok').value, $('#remember').checked);
+$('#tok').onkeydown = e => { if (e.key === 'Enter') $('#loginBtn').click(); };
+$('#logoutBtn').onclick = () => {
+  if (dirty && !confirm('Есть несохранённые изменения. Всё равно выйти?')) return;
+  localStorage.removeItem('gh_token'); sessionStorage.removeItem('gh_token'); setDirty(false); location.reload();
+};
+
+/* ---------- загрузка ---------- */
+async function listDir(dir){
+  try { return (await gh(cpath(dir) + '?ref=' + BRANCH)).filter(f => f.type === 'file'); }
+  catch (e){ if (e.status === 404) return []; throw e; }
+}
+async function loadAll(){
+  status('загружаю…');
+  const f = await gh(cpath('config.js') + '?ref=' + BRANCH);
+  cfgSha = f.sha;
+  const txt = dec64(f.content);
+  cfg = JSON.parse(txt.slice(txt.indexOf('{'), txt.lastIndexOf('}') + 1));
+  cfg.colors = { ...DEF_COLORS, ...(cfg.colors || {}) };
+  cfg.links = cfg.links || [];
+  for (const kind of ['music', 'videos']){
+    const list = await listDir(kind);
+    files[kind] = Object.fromEntries(list.map(x => [x.path, x]));
+    const known = (cfg[kind] || []).map(m => typeof m === 'string' ? { src: m, title: '', enabled: true } : m)
+                                   .filter(m => files[kind][m.src]);
+    for (const x of list) if (!known.some(m => m.src === x.path)) known.push({ src: x.path, title: x.name.replace(/\.[^.]+$/, ''), enabled: true });
+    cfg[kind] = known;
+  }
+  if (!cfg.videos.some(v => v.src === cfg.defaultVideo)) cfg.defaultVideo = cfg.videos[0]?.src || '';
+  renderAll(); setDirty(false);
+  status('готово. правь и жми «сохранить»', 'ok');
+}
+
+/* ---------- отрисовка ---------- */
+function renderAll(){
+  $$('[data-k]').forEach(el => el.value = cfg[el.dataset.k] ?? '');
+  $$('[data-c]').forEach(el => el.value = cfg.colors[el.dataset.c]);
+  $('#darkV').textContent = (+cfg.dark || 0).toFixed(2);
+  $('#volV').textContent = cfg.volume ?? 10;
+  renderLinks(); renderMedia('music'); renderMedia('videos'); renderJson();
+}
+function renderJson(){ $('#json').value = JSON.stringify(cfg, null, 2); }
+
+function renderLinks(){
+  $('#linkList').innerHTML = cfg.links.map((l, i) => `
+    <div class="item" data-i="${i}">
+      <input data-f="label" value="${H(l.label)}" placeholder="надпись">
+      <input class="url" data-f="url" value="${H(l.url)}" placeholder="https://… (пусто = без перехода)">
+      <select data-f="icon">${ICONS.map(ic => `<option ${ic === l.icon ? 'selected' : ''}>${ic}</option>`).join('')}</select>
+      <input type="color" data-f="color" value="${H(l.color || '#e9e9e9')}">
+      <div class="row">
+        <button class="ico" data-a="up" ${i ? '' : 'disabled'}>↑</button>
+        <button class="ico" data-a="down" ${i < cfg.links.length - 1 ? '' : 'disabled'}>↓</button>
+        <button class="ico danger" data-a="del">✕</button>
+      </div>
+    </div>`).join('') || '<p class="muted">кнопок нет</p>';
+}
+$('#linkList').addEventListener('input', e => {
+  const it = e.target.closest('.item'), f = e.target.dataset.f; if (!it || !f) return;
+  cfg.links[+it.dataset.i][f] = e.target.value; setDirty(true); renderJson();
+});
+$('#linkList').addEventListener('click', e => {
+  const a = e.target.closest('button')?.dataset.a; if (!a) return;
+  const i = +e.target.closest('.item').dataset.i, L = cfg.links;
+  if (a === 'up') [L[i-1], L[i]] = [L[i], L[i-1]];
+  if (a === 'down') [L[i+1], L[i]] = [L[i], L[i+1]];
+  if (a === 'del' && confirm(`Удалить кнопку «${L[i].label}»?`)) L.splice(i, 1);
+  setDirty(true); renderLinks(); renderJson();
+});
+$('#addLink').onclick = () => { cfg.links.push({ label: 'new', url: '', icon: 'link', color: '#e9e9e9' }); setDirty(true); renderLinks(); renderJson(); };
+
+function renderMedia(kind){
+  const list = cfg[kind], isV = kind === 'videos';
+  $('#' + kind + 'List').innerHTML = list.map((m, i) => {
+    const f = files[kind][m.src];
+    return `<div class="item ${m.enabled === false ? 'off' : ''}" data-i="${i}">
+      <div class="row">
+        <input type="checkbox" data-f="enabled" ${m.enabled !== false ? 'checked' : ''} title="показывать на сайте">
+        ${isV ? `<input type="radio" name="defv" data-f="default" ${cfg.defaultVideo === m.src ? 'checked' : ''} title="фон по умолчанию">` : ''}
+      </div>
+      <input class="ttl" data-f="title" value="${H(m.title)}" placeholder="название">
+      <div class="file"><b>${H(m.src.split('/').pop())}</b><br>${f ? mb(f.size) : '?'}${isV && cfg.defaultVideo === m.src ? '<span class="tagd">ПО УМОЛЧ.</span>' : ''}</div>
+      <div class="row act">
+        <button class="ico" data-a="play" title="прослушать / посмотреть">▶</button>
+        <button class="ico" data-a="up" ${i ? '' : 'disabled'}>↑</button>
+        <button class="ico" data-a="down" ${i < list.length - 1 ? '' : 'disabled'}>↓</button>
+        <button class="ico danger" data-a="del" title="удалить файл с сайта">✕</button>
+      </div>
+    </div>`;
+  }).join('') || '<p class="muted">пусто</p>';
+}
+for (const kind of ['music', 'videos']){
+  const box = $('#' + kind + 'List');
+  box.addEventListener('input', e => {
+    const it = e.target.closest('.item'), f = e.target.dataset.f; if (!it || !f) return;
+    const m = cfg[kind][+it.dataset.i];
+    if (f === 'enabled') m.enabled = e.target.checked;
+    else if (f === 'default') cfg.defaultVideo = m.src;
+    else m[f] = e.target.value;
+    setDirty(true); renderJson();
+    if (f !== 'title') renderMedia(kind);
+  });
+  box.addEventListener('click', async e => {
+    const a = e.target.closest('button')?.dataset.a; if (!a) return;
+    const i = +e.target.closest('.item').dataset.i, L = cfg[kind], m = L[i];
+    if (a === 'up'){ [L[i-1], L[i]] = [L[i], L[i-1]]; setDirty(true); }
+    if (a === 'down'){ [L[i+1], L[i]] = [L[i], L[i+1]]; setDirty(true); }
+    if (a === 'play'){
+      const p = $(kind === 'music' ? '#prevMusic' : '#prevVideos');
+      const url = '../' + m.src.split('/').map(encodeURIComponent).join('/') + '?v=' + Date.now();
+      p.style.display = 'block';
+      p.innerHTML = kind === 'music' ? `<audio src="${url}" controls autoplay></audio>` : `<video src="${url}" controls autoplay muted playsinline></video>`;
+      p.firstChild.onerror = () => p.innerHTML = '<p class="muted">файл ещё не появился на сайте — подожди 1–2 минуты после загрузки</p>';
+      return;
+    }
+    if (a === 'del'){
+      if (!confirm(`Удалить файл «${m.src}» из репозитория? Это нельзя отменить из панели.`)) return;
+      try {
+        status('удаляю ' + m.src + '…');
+        const f = files[kind][m.src];
+        if (f) await gh(cpath(m.src), { method: 'DELETE', body: JSON.stringify({ message: 'admin: delete ' + m.src, sha: f.sha, branch: BRANCH }) });
+        delete files[kind][m.src]; L.splice(i, 1);
+        if (kind === 'videos' && cfg.defaultVideo === m.src) cfg.defaultVideo = L[0]?.src || '';
+        await saveConfig('admin: remove ' + m.src);
+      } catch (err){ status('не удалось удалить: ' + err.message, 'err'); }
+    }
+    renderMedia(kind); renderJson();
+  });
+}
+
+/* ---------- загрузка файлов ---------- */
+const safeName = n => n.normalize('NFC').replace(/[^\p{L}\p{N} ._,()&-]+/gu, '_').replace(/\s+/g, ' ').trim() || 'file';
+for (const [kind, btn, input, prog] of [['music', '#upMusic', '#fileMusic', '#progMusic'], ['videos', '#upVideos', '#fileVideos', '#progVideos']]){
+  $(btn).onclick = () => $(input).click();
+  $(input).onchange = async e => {
+    const file = e.target.files[0]; e.target.value = ''; if (!file) return;
+    if (file.size > MAX) return status(`«${file.name}» весит ${mb(file.size)} — GitHub принимает до 95 МБ. Сожми файл.`, 'err');
+    const path = kind + '/' + safeName(file.name);
+    const existing = files[kind][path];
+    if (existing && !confirm(`Файл ${path} уже есть. Заменить?`)) return;
+    const bar = $(prog); bar.style.display = 'block'; bar.firstChild.style.width = '0';
+    $(btn).disabled = true;
+    try {
+      status(`читаю ${file.name}…`);
+      const b64 = await fileB64(file);
+      status(`загружаю ${file.name} (${mb(file.size)})…`);
+      const r = await put(path, b64, existing?.sha, 'admin: upload ' + path, p => { bar.firstChild.style.width = (p * 100) + '%'; status(`загружаю ${file.name}: ${Math.round(p * 100)}%`); });
+      files[kind][path] = { ...r.content, size: file.size };
+      if (!cfg[kind].some(m => m.src === path)) cfg[kind].push({ src: path, title: file.name.replace(/\.[^.]+$/, ''), enabled: true });
+      if (kind === 'videos' && !cfg.defaultVideo) cfg.defaultVideo = path;
+      renderMedia(kind);
+      await saveConfig('admin: add ' + path);
+    } catch (err){
+      status('загрузка не удалась: ' + err.message, 'err');
+    } finally { $(btn).disabled = false; setTimeout(() => bar.style.display = 'none', 800); }
+  };
+}
+
+/* ---------- поля ---------- */
+$$('[data-k]').forEach(el => el.addEventListener('input', () => {
+  cfg[el.dataset.k] = el.dataset.num !== undefined ? +el.value : el.value;
+  $('#darkV').textContent = (+cfg.dark || 0).toFixed(2);
+  $('#volV').textContent = cfg.volume ?? 10;
+  setDirty(true); renderJson();
+}));
+$$('[data-c]').forEach(el => el.addEventListener('input', () => { cfg.colors[el.dataset.c] = el.value; setDirty(true); renderJson(); }));
+$('#resetColors').onclick = () => { cfg.colors = { ...DEF_COLORS }; renderAll(); setDirty(true); };
+$('#applyJson').onclick = () => {
+  try { cfg = JSON.parse($('#json').value); cfg.colors = { ...DEF_COLORS, ...(cfg.colors || {}) }; cfg.links ||= []; cfg.music ||= []; cfg.videos ||= [];
+        renderAll(); setDirty(true); status('json применён — не забудь сохранить', 'ok'); }
+  catch (e){ status('ошибка в json: ' + e.message, 'err'); }
+};
+
+/* ---------- вкладки ---------- */
+$('#tabs').onclick = e => {
+  const b = e.target.closest('button'); if (!b) return;
+  $$('#tabs button').forEach(x => x.classList.toggle('on', x === b));
+  $$('.pane').forEach(p => p.classList.toggle('on', p.id === 'p-' + b.dataset.p));
+};
+
+/* ---------- сохранение и предпросмотр ---------- */
+async function saveConfig(message){
+  const body = 'window.SITE = ' + JSON.stringify(cfg, null, 2) + ';\n';
+  status('сохраняю…');
+  try {
+    const r = await put('config.js', enc64(body), cfgSha, message || 'admin: update config');
+    cfgSha = r.content.sha; setDirty(false);
+    status('сохранено ✓  сайт обновится через 1–2 минуты', 'ok');
+  } catch (e){
+    if (e.status === 409) status('конфиг изменился в другом месте — обнови страницу (F5) и повтори', 'err');
+    else status('не сохранилось: ' + e.message, 'err');
+    setDirty(true); throw e;
+  }
+}
+$('#saveBtn').onclick = () => saveConfig().catch(() => {});
+document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's' && token){ e.preventDefault(); $('#saveBtn').click(); } });
+$('#previewBtn').onclick = () => {
+  try { localStorage.setItem('site_preview', JSON.stringify(cfg)); } catch {}
+  open('../?preview=1', '_blank');
+};
+
+/* ---------- автовход ---------- */
+const saved = localStorage.getItem('gh_token') || sessionStorage.getItem('gh_token');
+if (saved) login(saved, !!localStorage.getItem('gh_token'));
+</script>
+</body>
+</html>
