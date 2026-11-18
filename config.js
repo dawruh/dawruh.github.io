@@ -11,7 +11,7 @@ window.SITE = {
   "gateText": "enter",
   "gateSub": "sound on. be careful",
   "volume": 8,
-  "dark": 0.72,
+  "dark": 0.69,
   "colors": {
     "c1": "#ff2a6d",
     "c2": "#8b5cff",
