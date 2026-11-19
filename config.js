@@ -33,7 +33,7 @@ window.SITE = {
     },
     {
       "label": "github",
-      "url": "https://github.com/dawruh",
+      "url": "",
       "icon": "github",
       "color": "#a371f7"
     },
