@@ -9,6 +9,7 @@ window.SITE = {
   "sub2": "no signal. no noise.",
   "coords": "// 52.23N 21.01E",
   "gateText": "enter",
+  "deniedText": "access denied",
   "gateSub": "sound on. be careful",
   "volume": 8,
   "dark": 0.69,
@@ -32,7 +33,7 @@ window.SITE = {
     },
     {
       "label": "github",
-      "url": "",
+      "url": "https://github.com/dawruh",
       "icon": "github",
       "color": "#a371f7"
     },

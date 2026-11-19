@@ -141,6 +141,7 @@ textarea{min-height:420px;font-size:12px;line-height:1.5;resize:vertical}
       <div class="card"><h2>// заставка и вкладка</h2><div class="grid">
         <label class="f"><span>кнопка входа</span><input data-k="gateText"></label>
         <label class="f"><span>подпись под кнопкой</span><input data-k="gateSub"></label>
+        <label class="f"><span>текст на кнопках без ссылки</span><input data-k="deniedText" placeholder="access denied"></label>
         <label class="f"><span>заголовок вкладки</span><input data-k="title"></label>
       </div></div>
     </section>
@@ -164,7 +165,7 @@ textarea{min-height:420px;font-size:12px;line-height:1.5;resize:vertical}
     <!-- кнопки -->
     <section class="pane links" id="p-links">
       <div class="card"><h2>// кнопки-ссылки</h2>
-        <p class="muted" style="margin-bottom:14px;font-size:11px">Пустая ссылка = кнопка-болванка без перехода.</p>
+        <p class="muted" style="margin-bottom:14px;font-size:11px">Пустая ссылка = кнопка без перехода: при наведении на ней красная анимация «access denied» (текст меняется во вкладке «тексты»).</p>
         <div class="list" id="linkList"></div>
         <button style="margin-top:14px" id="addLink">+ кнопка</button>
       </div>
